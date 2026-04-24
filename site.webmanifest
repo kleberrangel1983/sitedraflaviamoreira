@@ -1,0 +1,13 @@
+{
+  "name": "Dra. Flávia Moreira Rangel — Advogada",
+  "short_name": "Dra. Flávia",
+  "description": "Advogado e advogada em Divinópolis MG — Direito de Família, Sucessões e Defesa Profissional",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D1B3E",
+  "theme_color": "#0D1B3E",
+  "icons": [
+    { "src": "android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

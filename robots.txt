@@ -1,0 +1,11 @@
+# Robots.txt — draflaviamoreiraadvogada.com.br
+# Gerado em: 23/04/2026
+
+User-agent: *
+Allow: /
+
+# Bloqueia rastreamento de recursos desnecessários
+Disallow: /cdn-cgi/
+
+# Sitemap
+Sitemap: https://draflaviamoreiraadvogada.com.br/sitemap.xml
