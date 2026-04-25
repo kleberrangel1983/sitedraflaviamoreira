@@ -104,7 +104,7 @@ img{max-width:100%;display:block}a{text-decoration:none;transition:color 0.2s}ul
 .section-divider.left{justify-content:flex-start}
 .section-divider::before,.section-divider::after{content:"";height:1px;width:48px;background:var(--teal)}
 .section-divider.left::before{display:none}
-.section-divider span{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal)}
+.section-divider span{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal-dark)}
 .section-header h2{font-family:var(--font-serif);font-size:clamp(26px,4vw,38px);font-weight:700;color:var(--navy);margin-bottom:12px}
 .section-header p{font-size:17px;color:var(--mid-gray);max-width:580px;margin:0 auto}
 .cta-section{background:var(--teal);padding:80px 24px;text-align:center}
@@ -625,7 +625,8 @@ function closeMenu(){if(navMobile)navMobile.classList.remove("open")}
 
 
 
-<!-- MODAL KOALENDAR — Agendamento inline -->
+
+<!-- MODAL AGENDAMENTO — Koalendar lazy iframe -->
 <div class="cal-overlay" id="calModal" role="dialog" aria-modal="true" aria-label="Agendar Consulta">
   <div class="cal-modal">
     <div class="cal-header">
@@ -635,16 +636,16 @@ function closeMenu(){if(navMobile)navMobile.classList.remove("open")}
       </div>
       <button type="button" class="cal-close" onclick="fecharCal()" aria-label="Fechar">✕</button>
     </div>
-    <div class="cal-body">
-      <!-- Koalendar Inline Embed -->
-      <div id="koalendar-inline" style="width:100%;min-height:520px"></div>
-      <script>window.Koalendar=window.Koalendar||function(){(Koalendar.props=Koalendar.props||[]).push(arguments)};</script>
-      <script async src="https://koalendar.com/assets/widget.js" onload="Koalendar('inline',{url:'https://koalendar.com/e/consultoria-juridica',selector:'#koalendar-inline'})"></script>
-      <!-- End Koalendar -->
+    <div class="cal-body" id="calBody">
+      <!-- iframe carregado APENAS ao abrir o modal — zero impacto no LCP -->
+      <div id="cal-placeholder" style="display:flex;align-items:center;justify-content:center;min-height:520px;flex-direction:column;gap:16px;color:#7A8A99;font-family:var(--font-sans,-apple-system,sans-serif)">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#B8965A" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <p style="font-size:14px">Carregando calendário...</p>
+      </div>
     </div>
     <div class="cal-wpp-banner">
       <p>Prefere confirmar antes? Fale diretamente com a Dra. Flávia.</p>
-      <a href="https://wa.me/5537998262392?text=Ol%C3%A1%20Dra.%20Fl%C3%A1via%20Moreira%20Rangel%2C%20vim%20pelo%20site!" target="_blank" rel="noopener noreferrer">
+      <a href="https://wa.me/5537998262392?text=Ol%C3%A1%20Dra.%20Fl%C3%A1via%20Moreira%20Rangel%2C%20vim%20pelo%20site%21" target="_blank" rel="noopener noreferrer">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         WhatsApp
       </a>
@@ -653,14 +654,25 @@ function closeMenu(){if(navMobile)navMobile.classList.remove("open")}
 </div>
 
 
+
+
 <script>
+var calAberto = false;
 function abrirCal(origem) {
   var modal = document.getElementById('calModal');
   if (!modal) return;
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
-  if (typeof gtag === 'function') gtag('event', 'agendar_click', {event_category: 'agendamento', event_label: origem || 'geral'});
-  if (typeof fbq === 'function') fbq('track', 'Schedule', {origem: origem || 'geral'});
+  // Carrega o iframe do Koalendar APENAS na primeira abertura
+  if (!calAberto) {
+    calAberto = true;
+    var body = document.getElementById('calBody');
+    if (body) {
+      body.innerHTML = '<iframe src="https://koalendar.com/e/consultoria-juridica?embed=true" width="100%" height="520" frameborder="0" allow="camera; microphone; fullscreen" style="border:none;display:block;min-height:520px"></iframe>';
+    }
+  }
+  if (typeof gtag === 'function') gtag('event', 'agendar_click', {event_category:'agendamento', event_label: origem||'geral'});
+  if (typeof fbq === 'function') fbq('track', 'Schedule', {origem: origem||'geral'});
 }
 function fecharCal() {
   var modal = document.getElementById('calModal');
@@ -673,5 +685,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 document.addEventListener('keydown', function(e) { if (e.key === 'Escape') fecharCal(); });
 </script>
-
 </body></html>
